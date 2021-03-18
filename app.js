@@ -152,6 +152,30 @@ const addRole = () => {
     .catch(err => console.log(err))
 }
 
+const removeRole = () => {
+  db.query("SELECT * FROM roles", (err, roles) => {
+    if (err) { console.log(err) }
+    prompt([
+      {
+        type: 'list',
+        name: 'title',
+        choices: roles.map(role => ({
+          title: `${role.title}`
+        })),
+        message: 'Which role do you want to remove?'
+      }
+    ])
+      .then(({ title }) => {
+        db.query(`DELETE FROM roles WHERE title = ${role.title};`, (err, roles) => {
+          if (err) { console.log(err) }
+          console.log('Role has been deleted')
+          mainMenu()
+        })
+      })
+      .catch(err => console.log(err))
+  })
+}
+
 const mainMenu = () => {
   prompt([
     {
