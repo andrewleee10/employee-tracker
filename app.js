@@ -89,6 +89,69 @@ const removeEmployee = () => {
   })
 }
 
+const updateEmployee = () => {
+  db.query('SELECT * FROM employees', (err, employees) => {
+    prompt([
+      {
+        type: 'list',
+        name: 'first_name',
+        choices: employees.map(employee => ({
+          name: `${employee.first_name}`
+        })),
+        message: 'Which employee would you like to update?'
+      },
+      {
+        type: 'number',
+        name: 'role_id',
+        message: 'What is the new role?'
+      }
+    ])
+      .then( ({ first_name, role_id }) => {
+        db.query('UPDATE employees SET ? WHERE ?', [ {role_id}, {first_name} ], err => {
+          if(err) { console.log(err) }
+          console.log('UPDATE has been successsful.')
+          mainMenu()
+        })
+      })
+  })
+}
+
+const viewAllRoles = () => {
+  db.query('SELECT * FROM roles', (err, roles) => {
+    if(err) { console.log(err) }
+    console.table(roles)
+    mainMenu()
+  })
+}
+
+const addRole = () => {
+  prompt([
+    {
+      type: 'text',
+      name: 'title',
+      message: 'What is the role title?'
+    },
+    {
+      type: 'number',
+      name: 'salary',
+      message: 'What is the salary of the role?'
+    },
+    {
+      type: 'number',
+      name: 'department_id',
+      message: 'What is the department id?'
+    },
+  ])
+    .then(res => {
+      db.query('INSERT INTO roles SET ?', res, err => {
+        if (err) { console.log(err) }
+        console.log('Role added!')
+        mainMenu()
+      })
+    })
+    .catch(err => console.log(err))
+}
+
 const mainMenu = () => {
   prompt([
     {
