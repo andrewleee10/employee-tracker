@@ -21,6 +21,74 @@ const viewDepartment = () => {
   })
 }
 
+const viewEmployees = () => {
+  db.query('SELECT * FROM employees', (err, employees) => {
+    if (err) { console.log(err) }
+    console.table(employees)
+    mainMenu()
+  })
+}
+
+const addEmployee = () => {
+  db.query("SELECT employees.id, employees.first_name, employees.last_name FROM employees UNION SELECT roles.id, roles.title, roles.salary FROM roles", (err, employees) => {
+    prompt([
+      {
+        type: 'text',
+        name: 'first_name',
+        message: 'Enter first name:'
+      },
+      {
+        type: 'text',
+        name: 'last_name',
+        message: 'Enter last name:'
+      },
+      {
+        type: 'list',
+        name: 'role_id',
+        choices: ['Sales lead', 'Salesperson', 'Lead Engineer', 'Software Engineer', 'Account Manager', 'Accountant', 'Legal Team Lead', 'Lawyer'],
+        message: "What is the employee's role?"
+      },
+      {
+        type: 'number',
+        name: 'manager_id',
+        message: "What is the employee's manager's id?"
+      }
+    ])
+      .then( res => {
+        db.query('INSERT INTO employees SET ?', res, err => {
+          if (err) { console.log(err) }
+          console.log('Employee added!')
+          mainMenu()
+        })
+      })
+      .catch(err => console.log(err))
+  })
+}
+
+const removeEmployee = () => {
+  db.query("SELECT * FROM employees", (err, employees) => {
+    if (err) { console.log(err) }
+    prompt([
+      {
+        type: 'list',
+        name: 'employee',
+        choices: employees.map(employee => ({
+          id: `${employee.id}`
+        })),
+        message: 'Who do you want to remove?'
+      }
+    ])
+      .then( ({ employee }) => {
+        db.query(`DELETE FROM employee WHERE id = ${employee.id};`, (err, employees) => {
+          if (err) { console.log(err) }
+          console.log('Employee has been deleted')
+          mainMenu()
+        })
+      })
+      .catch(err => console.log(err))
+  })
+}
+
 const mainMenu = () => {
   prompt([
     {
